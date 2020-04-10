@@ -1,24 +1,35 @@
 // requires
-var express = require('express');
-var mongoose = require('mongoose');
-
-// Conexion DB
-mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', (err, res) => {
-    if(err) throw err;
-
-    console.log('MongoDB:27017  \x1b[32m%s\x1b[0m','online');
-})
+let express = require('express');
+let mongoose = require('mongoose');
+let bodyParser = require('body-parser');
 
 // inicializar variables
 var app = express();
 
-app.get('/', (req, res, next) => {
+// Body parser
+app.use(bodyParser.urlencoded({ extended: false }))
+app.use(bodyParser.json())
 
-    res.status(403).json({
-        ok: true,
-        mensaje: 'Realizado correctamente'
-    })
+// importar rutas
+var appRoutes = require('./routes/app');
+var usuarioRoutes = require('./routes/usuario');
+var loginRoutes = require('./routes/login');
+
+// Conexion DB
+mongoose.connect('mongodb://localhost:27017/hospitalDB', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+//    if(err) throw err;
+
 })
+console.log('MongoDB:27017  \x1b[32m%s\x1b[0m','online');
+
+// Rutas
+app.use('/usuario', usuarioRoutes);
+app.use('/login', loginRoutes);
+app.use('/', appRoutes);
+
 
 app.listen(3000, () => {
     console.log('Servidor localhost:3000 \x1b[32m%s\x1b[0m','online');
